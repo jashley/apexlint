@@ -150,6 +150,82 @@ class NoTestMethod(base.Validator):
     )
 
 
+class NonHorizontalSpaceCharacterWhitespace(base.Validator):
+    """A whitespace character other than 0x20 is present"""
+    invalid = re.compile(
+        r"""
+        (?P<cursor>
+            [\t\n\r\f\v]
+        )
+        """,
+        flags=(re.IGNORECASE | re.VERBOSE),
+    )
+
+
+class TooLongLine(base.Validator):
+    """More than 100 characters on a single line"""
+    invalid = re.compile(
+        r"""
+        (?P<cursor>
+            ^.{100,}$
+        )
+        """,
+        flags=(re.IGNORECASE | re.VERBOSE),
+    )
+
+
+class NoSpaceAfterReservedWord(base.Validator):
+    """There is no space that follows a reserved word"""
+    invalid = re.compile(
+        r"""
+        (?P<cursor>
+            \b(catch|do|else|finally|for|if|throw|try|while)\b
+        )
+        \S+
+        """,
+        flags=(re.IGNORECASE | re.VERBOSE),
+    )
+
+
+class NoSpaceBeforeCurlyBrace(base.Validator):
+    """There is no space before this curly brace"""
+    invalid = re.compile(
+        r"""
+        (?P<cursor>
+            (?<=\S){
+        )
+        """,
+        flags=(re.IGNORECASE | re.VERBOSE),
+    )
+
+
+class NoSpaceAfterCurlyBrace(base.Validator):
+    """There is no space after this curly brace"""
+    invalid = re.compile(
+        r"""
+        (?P<cursor>
+            }
+        )
+        \w+
+        """,
+        flags=(re.IGNORECASE | re.VERBOSE),
+    )
+
+
+class HardcodedIDs(base.Validator):
+    """Hardcoded IDs present outside of test classes"""
+    excluded = ("*Test.cls", "TestUtils.cls", "UnitTestFactory.cls")
+    pattern = ''
+    invalid = re.compile(
+        r"""
+        (?P<cursor>
+            '(?=[0-9a-zA-Z]*\d)[0-9a-zA-Z]{15}([0-9a-zA-Z]{3})?'
+        )
+        """, 
+        flags=(re.IGNORECASE | re.VERBOSE),
+    )
+
+
 def library(
     *,
     select: AbstractSet[str] = frozenset(),
