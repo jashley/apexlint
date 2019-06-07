@@ -123,11 +123,13 @@ class Validator(abc.ABC):
     """Define a validator to run against a source file:
     `invalid` is a regexp that matches errors in the file.
     `filenames` is a sequence of wildcard patterns for files to match.
+    `excluded` is a sequence of wildcard patterns for files to not match.
     `suppress` is a regexp that silences an error if it matches.
     """
 
     invalid: Pattern
     filenames: Iterable[str] = ("*.cls", "*.trigger")
+    excluded: Iterable[str] = ()
     suppress: Optional[Pattern] = None
 
     @classmethod
@@ -135,6 +137,7 @@ class Validator(abc.ABC):
         return (
             pathtools.StdIn.typeof(path)
             or bool(cls.filenames)
+            and all(not path.match(pattern) for pattern in cls.excluded)
             and any(path.match(pattern) for pattern in cls.filenames)
         )
 
